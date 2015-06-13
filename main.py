@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request 
+import random
 app = Flask(__name__)
 
 board = [[0 for i in xrange(15)] for i in xrange(15)]
@@ -34,12 +35,46 @@ def calculate_danger(ox, oy):
 			if(board[i][j] == 1):
 				danger.append([i,j])
 
-	print danger
+	return danger
 
-def allowed_moves(ox, oy):
-	calculate_danger(ox, oy)
+def calculate_available(yx, yy):
+	available = []
+	available.append([yx-1,yy])
+	available.append([yx-1,yy+1])
+	available.append([yx,yy+1])
+	available.append([yx+1,yy+1])
+	available.append([yx+1,yy])
+	available.append([yx+1,yy-1])
+	available.append([yx,yy-1])
+	available.append([yx-1,yy-1])
 
+	avail = available[:]
+	for temp in available:
+		i, j = temp[0], temp[1]
+		if(i==-1 or i==data["grid"] or j==-1 or j==data["grid"]):
+			avail.remove(temp)
 
+	return avail
+
+def  calculate_move(ox, oy):
+	danger = calculate_danger(ox, oy)
+	available = calculate_available(data["currX"],data["currY"])
+	allowed = []
+
+	for possible in available:
+		if possible not in danger:
+			allowed.append(possible)
+
+	temp = random.randint(0,len(allowed)-1)
+	move = allowed[temp]
+	return move
+
+def print_board():
+	for i in range(data["grid"]):
+		for j in range(data["grid"]):
+			print board[i][j],
+		print "\n"
+	
 
 
 
@@ -66,13 +101,15 @@ def start():
 
 @app.route('/play')
 def play():
-	#move = Calculate_move()	
 	x, y = calculate_pos(request.args.get('m'))
 	set_visited(x, y)
 
-	allowed_moves(x, y)
+	move = calculate_move(x, y)
+	x, y = move[0], move[1]
+	set_visited(x, y)
 
-	response = str(x) + '|' + str(y)
+	print_board()
+	response = str(x+1) + '|' + str(y+1)
 	return jsonify({'m': response})
 
 if __name__ == '__main__':
