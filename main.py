@@ -65,8 +65,12 @@ def  calculate_move(ox, oy):
 		if possible not in danger:
 			allowed.append(possible)
 
-	temp = random.randint(0,len(allowed)-1)
-	move = allowed[temp]
+	if [ox, oy] in allowed:
+		move = [ox, oy]
+	else:
+		temp = random.randint(0,len(allowed)-1)
+		move = allowed[temp]
+
 	return move
 
 def print_board():
@@ -101,14 +105,18 @@ def start():
 
 @app.route('/play')
 def play():
-	x, y = calculate_pos(request.args.get('m'))
-	set_visited(x, y)
+	ox, oy = calculate_pos(request.args.get('m'))
 
-	move = calculate_move(x, y)
+	move = calculate_move(ox, oy)
 	x, y = move[0], move[1]
-	set_visited(x, y)
+	data["currX"] = x
+	data["currY"] = y
+	board[ox][oy] = 7
+	board[x][y] = 5
 
 	print_board()
+	set_visited(x, y)
+	set_visited(ox, oy)
 	response = str(x+1) + '|' + str(y+1)
 	return jsonify({'m': response})
 
