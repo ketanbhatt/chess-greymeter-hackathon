@@ -6,8 +6,6 @@ board = [[0 for i in xrange(15)] for i in xrange(15)]
 data = { }
 
 
-
-
 #################################
 #############Functions##############
 #################################
@@ -75,11 +73,10 @@ def  calculate_move(ox, oy):
 
 def print_board():
 	for i in range(data["grid"]):
-		for j in range(data["grid"]):
-			print board[i][j],
+		for j in range(data["grid"]-1, -1, -1):
+			print board[data["grid"]-j-1][data["grid"]-i-1],
 		print "\n"
 	
-
 
 
 #################################
