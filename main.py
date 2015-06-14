@@ -66,8 +66,20 @@ def  calculate_move(ox, oy):
 	if [ox, oy] in allowed:
 		move = [ox, oy]
 	else:
-		temp = random.randint(0,len(allowed)-1)
-		move = allowed[temp]
+		x1, y1 = allowed[0][0], allowed[0][1]
+		x2, y2 = ox, oy
+		pos = allowed[0]
+		diff = (y2-y1)*(y2-y1) + (x2-x1)*(x2-x1)
+		#temp = random.randint(0,len(allowed)-1)
+		for new_pos in allowed:
+			x1, y1 = new_pos[0], new_pos[1]
+			new_diff = (y2-y1)*(y2-y1) + (x2-x1)*(x2-x1)
+			if new_diff < diff:
+				diff = new_diff
+				pos = new_pos
+
+
+		move = pos
 
 	return move
 
@@ -89,6 +101,11 @@ def ping():
 
 @app.route('/start')
 def start():
+	global board
+	for i in range(15):
+		for j in range(15):
+			board[i][j] = 0
+
 	yx, yy = calculate_pos(request.args.get('y'))
 	ox, oy = calculate_pos(request.args.get('o'))
 	data["grid"] = int(request.args.get('g'))
@@ -118,4 +135,4 @@ def play():
 	return jsonify({'m': response})
 
 if __name__ == '__main__':
-	app.run(port=8080)
+	app.run(port=8080, host='192.168.1.219')
